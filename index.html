@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Форма для Zoho CRM через Make</title>
+  <title>Contact Form to Zoho CRM</title>
 </head>
 <body>
-  <h1>Форма з відправкою в Zoho CRM</h1>
+  <h1>Contact Us</h1>
   <form id="contactForm">
     <label>
-      Ім’я:
+      Name:
       <input type="text" name="name" required>
     </label>
     <br><br>
@@ -19,11 +19,11 @@
     </label>
     <br><br>
     <label>
-      Телефон:
+      Phone:
       <input type="tel" name="phone">
     </label>
     <br><br>
-    <button type="submit">Надіслати</button>
+    <button type="submit">Submit</button>
   </form>
 
   <script>
@@ -37,10 +37,10 @@
           method: 'POST',
           body: formData
         });
-        alert("Форма успішно відправлена!");
+        alert("Form successfully submitted!");
         form.reset();
       } catch (error) {
-        alert("Сталася помилка при відправці.");
+        alert("An error occurred while submitting the form.");
         console.error(error);
       }
     });
