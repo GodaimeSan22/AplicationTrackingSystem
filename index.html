@@ -1,17 +1,49 @@
-<form id="contactForm">
-    <input type="text" name="name" placeholder="Ваше ім’я" required />
-    <input type="email" name="email" placeholder="Email" required />
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Форма для Zoho CRM через Make</title>
+</head>
+<body>
+  <h1>Форма з відправкою в Zoho CRM</h1>
+  <form id="contactForm">
+    <label>
+      Ім’я:
+      <input type="text" name="name" required>
+    </label>
+    <br><br>
+    <label>
+      Email:
+      <input type="email" name="email" required>
+    </label>
+    <br><br>
+    <label>
+      Телефон:
+      <input type="tel" name="phone">
+    </label>
+    <br><br>
     <button type="submit">Надіслати</button>
   </form>
-  
+
   <script>
-  document.getElementById('contactForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    fetch('https://hook.eu2.make.com/jedsueuigrnhcd9mlm1ulr9ar4yq64b8', {
-      method: 'POST',
-      body: formData
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      try {
+        await fetch('https://hook.eu2.make.com/mbm1q2ak4re8ri2fr75fxeddsfq6i71w', {
+          method: 'POST',
+          body: formData
+        });
+        alert("Форма успішно відправлена!");
+        form.reset();
+      } catch (error) {
+        alert("Сталася помилка при відправці.");
+        console.error(error);
+      }
     });
-  });
   </script>
-  
+</body>
+</html>
