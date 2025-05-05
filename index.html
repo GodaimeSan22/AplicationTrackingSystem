@@ -28,7 +28,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
     }
 
     h1 {
@@ -37,14 +37,14 @@
       margin-bottom: 20px;
     }
 
-    label {
+    label, fieldset {
       display: block;
       margin-top: 15px;
       font-weight: 600;
       color: var(--text-color);
     }
 
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
@@ -54,7 +54,13 @@
       font-size: 14px;
     }
 
-    input:focus, textarea:focus {
+    fieldset label {
+      font-weight: normal;
+      display: block;
+      margin: 5px 0;
+    }
+
+    input:focus, textarea:focus, select:focus {
       outline: none;
       border-color: var(--primary-color);
       box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
@@ -91,7 +97,7 @@
     <label>Volunteer Name*:
       <input type="text" name="volunteer_name" required>
     </label>
-    
+
     <label>Last Name*:
       <input type="text" name="last_name" required>
     </label>
@@ -128,6 +134,19 @@
       <textarea name="notes" rows="4" required></textarea>
     </label>
 
+    <label>Skills (comma-separated)*:
+      <input type="text" name="skills" required>
+    </label>
+
+    <fieldset>
+      <legend>Areas of Interest *</legend>
+      <label><input type="checkbox" name="interests" value="Academic/Accreditation"> Academic/Accreditation</label>
+      <label><input type="checkbox" name="interests" value="Business Analysis"> Business Analysis</label>
+      <label><input type="checkbox" name="interests" value="Data Analytics"> Data Analytics</label>
+      <label><input type="checkbox" name="interests" value="Events"> Events</label>
+      <label><input type="checkbox" name="interests" value="Project Management"> Project Management</label>
+    </fieldset>
+
     <label>Upload Resume (PDF/DOCX, max 2MB)*:
       <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
     </label>
@@ -146,7 +165,15 @@
         return;
       }
 
+      const checkboxes = form.querySelectorAll('input[name="interests"]:checked');
+      if (checkboxes.length === 0) {
+        alert("Please select at least one area of interest.");
+        return;
+      }
+
       const formData = new FormData(form);
+      const selectedInterests = Array.from(checkboxes).map(cb => cb.value);
+      formData.append('selected_interests', selectedInterests.join(', '));
 
       try {
         await fetch('https://hook.eu2.make.com/mbm1q2ak4re8ri2fr75fxeddsfq6i71w', {
