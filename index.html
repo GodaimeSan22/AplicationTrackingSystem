@@ -2,34 +2,150 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>Volunteer Application</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact Form to Zoho CRM</title>
+  <style>
+    :root {
+      --primary-color: #4CAF50;
+      --background: #f4f7f8;
+      --form-bg: #fff;
+      --text-color: #333;
+      --input-border: #ccc;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    form {
+      background: var(--form-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    @media (max-width: 500px) {
+      form {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Contact Us</h1>
-  <form id="contactForm">
-    <label>
-      Name:
-      <input type="text" name="name" required>
+  <form id="volunteerForm">
+    <h1>Volunteer Application</h1>
+
+    <label>Volunteer Name*:
+      <input type="text" name="volunteer_name" required>
     </label>
-    <br><br>
-    <label>
-      Email:
+    
+    <label>Last Name*:
+      <input type="text" name="last_name" required>
+    </label>
+
+    <label>Email*:
       <input type="email" name="email" required>
     </label>
-    <br><br>
-    <label>
-      Phone:
-      <input type="tel" name="phone">
+
+    <label>Country*:
+      <input type="text" name="country" required>
     </label>
-    <br><br>
+
+    <label>LinkedIn Profile*:
+      <input type="url" name="linkedin_profile" required>
+    </label>
+
+    <label>Company*:
+      <input type="text" name="company" required>
+    </label>
+
+    <label>Status*:
+      <input type="text" name="status" required>
+    </label>
+
+    <label>Preferred Department*:
+      <input type="text" name="preferred_department" required>
+    </label>
+
+    <label>Region*:
+      <input type="text" name="region" required>
+    </label>
+
+    <label>Notes*:
+      <textarea name="notes" rows="4" required></textarea>
+    </label>
+
+    <label>Upload Resume (PDF/DOCX, max 2MB)*:
+      <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+    </label>
+
     <button type="submit">Submit</button>
   </form>
 
   <script>
-    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    document.getElementById('volunteerForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const form = e.target;
+      const file = form.resume.files[0];
+
+      if (!file || file.size > 2 * 1024 * 1024) {
+        alert("Please upload a file (PDF or DOCX) not larger than 2MB.");
+        return;
+      }
+
       const formData = new FormData(form);
 
       try {
@@ -37,10 +153,10 @@
           method: 'POST',
           body: formData
         });
-        alert("Form successfully submitted!");
+        alert("Form submitted successfully!");
         form.reset();
       } catch (error) {
-        alert("An error occurred while submitting the form.");
+        alert("Error submitting the form.");
         console.error(error);
       }
     });
