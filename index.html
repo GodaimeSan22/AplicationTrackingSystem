@@ -28,7 +28,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       width: 100%;
-      max-width: 700px;
+      max-width: 800px;
     }
 
     h1 {
@@ -54,21 +54,29 @@
       font-size: 14px;
     }
 
-    fieldset label {
-      font-weight: normal;
-      display: block;
-      margin: 5px 0;
-    }
-
     input:focus, textarea:focus, select:focus {
       outline: none;
       border-color: var(--primary-color);
       box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
     }
 
+    .checkbox-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px 0;
+    }
+
+    .checkbox-list label {
+      font-weight: normal;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     button {
-      margin-top: 20px;
-      padding: 12px 20px;
+      margin-top: 25px;
+      padding: 14px 20px;
       background-color: var(--primary-color);
       color: white;
       border: none;
@@ -140,11 +148,13 @@
 
     <fieldset>
       <legend>Areas of Interest *</legend>
-      <label><input type="checkbox" name="interests" value="Academic/Accreditation"> Academic/Accreditation</label>
-      <label><input type="checkbox" name="interests" value="Business Analysis"> Business Analysis</label>
-      <label><input type="checkbox" name="interests" value="Data Analytics"> Data Analytics</label>
-      <label><input type="checkbox" name="interests" value="Events"> Events</label>
-      <label><input type="checkbox" name="interests" value="Project Management"> Project Management</label>
+      <div class="checkbox-list">
+        <label>Academic/Accreditation <input type="checkbox" name="interests" value="Academic/Accreditation"></label>
+        <label>Business Analysis <input type="checkbox" name="interests" value="Business Analysis"></label>
+        <label>Data Analytics <input type="checkbox" name="interests" value="Data Analytics"></label>
+        <label>Events <input type="checkbox" name="interests" value="Events"></label>
+        <label>Project Management <input type="checkbox" name="interests" value="Project Management"></label>
+      </div>
     </fieldset>
 
     <label>Upload Resume (PDF/DOCX, max 2MB)*:
