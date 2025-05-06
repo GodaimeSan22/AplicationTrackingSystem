@@ -25,7 +25,10 @@
       const res = await fetch("https://hook.eu2.make.com/3ck44is39dfmap58tr7w47mr21dpfdhl", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({
+          email: email,
+          secret: "mysecuretoken"
+        })
       });
 
       const tasks = await res.json();
@@ -40,20 +43,14 @@
       }
 
       let html = `<table><tr>
-        <th>Title</th><th>Description</th><th>Status</th><th>Hours</th><th>Update</th>
+        <th>Task Title</th><th>Department</th><th>Description</th><th>Hours Spent</th><th>Update</th>
       </tr>`;
 
       tasks.forEach(task => {
         html += `<tr>
           <td>${task["Task Title"]}</td>
+          <td>${task["Department"]}</td>
           <td>${task["Task Description"]}</td>
-          <td>
-            <select id="status-${task["Task ID"]}">
-              <option ${task["Task Status"] === "Not Started" ? "selected" : ""}>Not Started</option>
-              <option ${task["Task Status"] === "In Progress" ? "selected" : ""}>In Progress</option>
-              <option ${task["Task Status"] === "Completed" ? "selected" : ""}>Completed</option>
-            </select>
-          </td>
           <td><input type="number" id="hours-${task["Task ID"]}" value="${task["Hours Spent"] || 0}" step="0.1"></td>
           <td><button onclick="updateTask('${task["Task ID"]}')">Save</button></td>
         </tr>`;
@@ -64,7 +61,6 @@
     }
 
     async function updateTask(taskId) {
-      const status = document.getElementById(`status-${taskId}`).value;
       const hours = parseFloat(document.getElementById(`hours-${taskId}`).value);
 
       await fetch("https://hook.eu2.make.com/mbm1q2ak4re8ri2fr75fxeddsfq6i71w", {
@@ -72,8 +68,8 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           taskId,
-          "Task Status": status,
-          "Hours Spent": hours
+          "Hours Spent": hours,
+          secret: "mysecuretoken"
         })
       });
 
