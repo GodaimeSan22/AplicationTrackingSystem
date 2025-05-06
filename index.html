@@ -1,80 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Volunteer Tasks</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    input, select, textarea { margin: 5px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 10px; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7f9;
+      padding: 40px;
+      color: #333;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input[type="email"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 10px 16px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f0f2f5;
+      font-weight: bold;
+    }
+
+    input[type="number"] {
+      width: 80px;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .centered {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .success-message {
+      color: green;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <h2>Enter your email to view your tasks</h2>
-  <input type="email" id="email" placeholder="you@example.com">
+
+  <h2>Check Your Volunteer Tasks</h2>
+
+  <input type="email" id="email" placeholder="Enter your email">
   <button onclick="loadTasks()">Load Tasks</button>
 
-  <div id="tasks-container"></div>
+  <div id="tasks-container" class="centered"></div>
 
   <script>
     async function loadTasks() {
-      const email = document.getElementById("email").value;
-      if (!email) return alert("Please enter your email");
+      const email = document.getElementById("email").value.trim();
+      const container = document.getElementById("tasks-container");
+      container.innerHTML = "";
 
-      const res = await fetch("https://hook.eu2.make.com/3ck44is39dfmap58tr7w47mr21dpfdhl", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email,
-          secret: "mysecuretoken"
-        })
-      });
+      if (!email) {
+        alert("Please enter your email.");
+        return;
+      }
 
-      const tasks = await res.json();
-      showTasks(tasks);
+      try {
+        const res = await fetch("https://hook.eu2.make.com/3ck44is39dfmap58tr7w47mr21dpfdhl", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: email,
+            secret: "mysecuretoken"
+          })
+        });
+
+        const tasks = await res.json();
+        showTasks(tasks);
+      } catch (error) {
+        container.innerHTML = "<p style='color:red;'>Error loading tasks. Please try again later.</p>";
+      }
     }
 
     function showTasks(tasks) {
       const container = document.getElementById("tasks-container");
-      if (!tasks.length) {
+
+      if (!Array.isArray(tasks) || tasks.length === 0) {
         container.innerHTML = "<p>No tasks found.</p>";
         return;
       }
 
-      let html = `<table><tr>
-        <th>Task Title</th><th>Department</th><th>Description</th><th>Hours Spent</th><th>Update</th>
-      </tr>`;
+      let html = `<table>
+        <tr>
+          <th>Task Name</th>
+          <th>Department</th>
+          <th>Description</th>
+          <th>Hours Spent</th>
+          <th>Update</th>
+        </tr>`;
 
       tasks.forEach(task => {
-        html += `<tr>
-          <td>${task["Task Title"]}</td>
-          <td>${task["Department"]}</td>
-          <td>${task["Task Description"]}</td>
-          <td><input type="number" id="hours-${task["Task ID"]}" value="${task["Hours Spent"] || 0}" step="0.1"></td>
-          <td><button onclick="updateTask('${task["Task ID"]}')">Save</button></td>
-        </tr>`;
+        html += `
+          <tr>
+            <td>${task["Name"] || "-"}</td>
+            <td>${task["Department"] || "-"}</td>
+            <td>${task["Task_Description"] || "-"}</td>
+            <td>
+              <input type="number" id="hours-${task["Task_ID"]}" 
+                     value="${task["Hours_Spent"] || 0}" 
+                     step="0.1" min="0">
+            </td>
+            <td>
+              <button onclick="updateTask('${task["Task_ID"]}')">Save</button>
+            </td>
+          </tr>`;
       });
 
-      html += "</table>";
+      html += `</table>`;
       container.innerHTML = html;
     }
 
     async function updateTask(taskId) {
-      const hours = parseFloat(document.getElementById(`hours-${taskId}`).value);
+      const input = document.getElementById(`hours-${taskId}`);
+      const hours = parseFloat(input.value);
 
-      await fetch("https://hook.eu2.make.com/mbm1q2ak4re8ri2fr75fxeddsfq6i71w", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          taskId,
-          "Hours Spent": hours,
-          secret: "mysecuretoken"
-        })
-      });
+      try {
+        await fetch("https://hook.eu2.make.com/mbm1q2ak4re8ri2fr75fxeddsfq6i71w", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            taskId: taskId,
+            "Hours_Spent": hours,
+            secret: "mysecuretoken"
+          })
+        });
 
-      alert("Task updated!");
+        alert("Task updated!");
+      } catch (error) {
+        alert("Error updating task.");
+      }
     }
   </script>
+
 </body>
 </html>
