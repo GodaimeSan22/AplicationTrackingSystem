@@ -1,202 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Volunteer Application</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volunteer Tasks</title>
   <style>
-    :root {
-      --primary-color: #4CAF50;
-      --background: #f4f7f8;
-      --form-bg: #fff;
-      --text-color: #333;
-      --input-border: #ccc;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--background);
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-    }
-
-    form {
-      background: var(--form-bg);
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 800px;
-    }
-
-    h1 {
-      text-align: center;
-      color: var(--primary-color);
-      margin-bottom: 20px;
-    }
-
-    label, fieldset {
-      display: block;
-      margin-top: 15px;
-      font-weight: 600;
-      color: var(--text-color);
-    }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid var(--input-border);
-      border-radius: 8px;
-      box-sizing: border-box;
-      font-size: 14px;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-    }
-
-    .checkbox-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding: 10px 0;
-    }
-
-    .checkbox-list label {
-      font-weight: normal;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    button {
-      margin-top: 25px;
-      padding: 14px 20px;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      width: 100%;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    @media (max-width: 500px) {
-      form {
-        padding: 20px;
-      }
-    }
+    body { font-family: Arial; padding: 20px; }
+    input, select, textarea { margin: 5px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; }
   </style>
 </head>
 <body>
-  <form id="volunteerForm">
-    <h1>Volunteer Application</h1>
+  <h2>Enter your email to view your tasks</h2>
+  <input type="email" id="email" placeholder="you@example.com">
+  <button onclick="loadTasks()">Load Tasks</button>
 
-    <label>Volunteer Name*:
-      <input type="text" name="volunteer_name" required>
-    </label>
-
-    <label>Last Name*:
-      <input type="text" name="last_name" required>
-    </label>
-
-    <label>Email*:
-      <input type="email" name="email" required>
-    </label>
-
-    <label>Country*:
-      <input type="text" name="country" required>
-    </label>
-
-    <label>LinkedIn Profile*:
-      <input type="url" name="linkedin_profile" required>
-    </label>
-
-    <label>Company*:
-      <input type="text" name="company" required>
-    </label>
-
-    <label>Status*:
-      <input type="text" name="status" required>
-    </label>
-
-    <label>Preferred Department*:
-      <input type="text" name="preferred_department" required>
-    </label>
-
-    <label>Region*:
-      <input type="text" name="region" required>
-    </label>
-
-    <label>Notes*:
-      <textarea name="notes" rows="4" required></textarea>
-    </label>
-
-    <label>Skills (comma-separated)*:
-      <input type="text" name="skills" required>
-    </label>
-
-    <fieldset>
-      <legend>Areas of Interest *</legend>
-      <div class="checkbox-list">
-        <label>Academic/Accreditation <input type="checkbox" name="interests" value="Academic/Accreditation"></label>
-        <label>Business Analysis <input type="checkbox" name="interests" value="Business Analysis"></label>
-        <label>Data Analytics <input type="checkbox" name="interests" value="Data Analytics"></label>
-        <label>Events <input type="checkbox" name="interests" value="Events"></label>
-        <label>Project Management <input type="checkbox" name="interests" value="Project Management"></label>
-      </div>
-    </fieldset>
-
-    <label>Upload Resume (PDF/DOCX, max 2MB)*:
-      <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
-    </label>
-
-    <button type="submit">Submit</button>
-  </form>
+  <div id="tasks-container"></div>
 
   <script>
-    document.getElementById('volunteerForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const form = e.target;
-      const file = form.resume.files[0];
+    async function loadTasks() {
+      const email = document.getElementById("email").value;
+      if (!email) return alert("Please enter your email");
 
-      if (!file || file.size > 2 * 1024 * 1024) {
-        alert("Please upload a file (PDF or DOCX) not larger than 2MB.");
+      const res = await fetch("https://hook.eu2.make.com/3ck44is39dfmap58tr7w47mr21dpfdhl", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+
+      const tasks = await res.json();
+      showTasks(tasks);
+    }
+
+    function showTasks(tasks) {
+      const container = document.getElementById("tasks-container");
+      if (!tasks.length) {
+        container.innerHTML = "<p>No tasks found.</p>";
         return;
       }
 
-      const checkboxes = form.querySelectorAll('input[name="interests"]:checked');
-      if (checkboxes.length === 0) {
-        alert("Please select at least one area of interest.");
-        return;
-      }
+      let html = `<table><tr>
+        <th>Title</th><th>Description</th><th>Status</th><th>Hours</th><th>Update</th>
+      </tr>`;
 
-      const formData = new FormData(form);
-      const selectedInterests = Array.from(checkboxes).map(cb => cb.value);
-      formData.append('selected_interests', selectedInterests.join(', '));
+      tasks.forEach(task => {
+        html += `<tr>
+          <td>${task["Task Title"]}</td>
+          <td>${task["Task Description"]}</td>
+          <td>
+            <select id="status-${task["Task ID"]}">
+              <option ${task["Task Status"] === "Not Started" ? "selected" : ""}>Not Started</option>
+              <option ${task["Task Status"] === "In Progress" ? "selected" : ""}>In Progress</option>
+              <option ${task["Task Status"] === "Completed" ? "selected" : ""}>Completed</option>
+            </select>
+          </td>
+          <td><input type="number" id="hours-${task["Task ID"]}" value="${task["Hours Spent"] || 0}" step="0.1"></td>
+          <td><button onclick="updateTask('${task["Task ID"]}')">Save</button></td>
+        </tr>`;
+      });
 
-      try {
-        await fetch('https://hook.eu2.make.com/mbm1q2ak4re8ri2fr75fxeddsfq6i71w', {
-          method: 'POST',
-          body: formData
-        });
-        alert("Form submitted successfully!");
-        form.reset();
-      } catch (error) {
-        alert("Error submitting the form.");
-        console.error(error);
-      }
-    });
+      html += "</table>";
+      container.innerHTML = html;
+    }
+
+    async function updateTask(taskId) {
+      const status = document.getElementById(`status-${taskId}`).value;
+      const hours = parseFloat(document.getElementById(`hours-${taskId}`).value);
+
+      await fetch("https://hook.eu2.make.com/mbm1q2ak4re8ri2fr75fxeddsfq6i71w", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskId,
+          "Task Status": status,
+          "Hours Spent": hours
+        })
+      });
+
+      alert("Task updated!");
+    }
   </script>
 </body>
 </html>
