@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Volunteer Tasks</title>
+  <title>Volunteer Tasks Portal</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -10,34 +10,24 @@
       padding: 40px;
       color: #333;
     }
-
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    input[type="email"] {
+    h2 { margin-top: 40px; }
+    input, select, textarea, button {
       padding: 10px;
       font-size: 16px;
-      width: 300px;
-      border: 1px solid #ccc;
+      margin: 5px 0;
       border-radius: 6px;
+      border: 1px solid #ccc;
     }
-
     button {
-      padding: 10px 16px;
-      font-size: 16px;
       background-color: #4CAF50;
       color: white;
-      border: none;
-      border-radius: 6px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      border: none;
     }
-
     button:hover {
       background-color: #45a049;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -47,132 +37,135 @@
       border-radius: 8px;
       overflow: hidden;
     }
-
     th, td {
       padding: 14px;
       text-align: left;
       border-bottom: 1px solid #ddd;
     }
-
-    th {
-      background-color: #f0f2f5;
-      font-weight: bold;
-    }
-
-    input[type="number"] {
-      width: 80px;
-      padding: 6px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .centered {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .success-message {
-      color: green;
-      margin-top: 10px;
-    }
+    th { background-color: #f0f2f5; font-weight: bold; }
+    .section { margin-bottom: 50px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   </style>
 </head>
 <body>
 
-  <h2>Check Your Volunteer Tasks</h2>
+  <h1>Volunteer Tasks Portal</h1>
 
-  <input type="email" id="email" placeholder="Enter your email">
-  <button onclick="loadTasks()">Load Tasks</button>
+  <!-- 1. View Tasks -->
+  <div class="section">
+    <h2>1. View Your Tasks</h2>
+    <input type="email" id="email" placeholder="Enter your email">
+    <button onclick="loadTasks()">Load Tasks</button>
+    <div id="tasks-container"></div>
+  </div>
 
-  <div id="tasks-container" class="centered"></div>
+  <!-- 2. Add New Task (hidden initially) -->
+  <div class="section" id="add-task-section" style="display:none;">
+    <h2>2. Add a New Task</h2>
+    <div class="form-grid">
+      <input id="new-title" placeholder="Task Title">
+      <input id="new-email" type="email" placeholder="Your Email">
+      <input id="new-department" placeholder="Department">
+      <select id="new-status">
+        <option>To Do</option>
+        <option>In Progress</option>
+        <option>Done</option>
+        <option>Paused</option>
+      </select>
+      <input id="new-hours" type="number" step="0.1" placeholder="Hours Spent">
+    </div>
+    <textarea id="new-description" rows="3" style="width:100%;" placeholder="Task Description"></textarea>
+    <button onclick="addTask()">Create Task</button>
+    <div id="add-message"></div>
+  </div>
 
   <script>
     async function loadTasks() {
       const email = document.getElementById("email").value.trim();
       const container = document.getElementById("tasks-container");
       container.innerHTML = "";
-
-      if (!email) {
-        alert("Please enter your email.");
-        return;
-      }
-
+      if (!email) return alert("Please enter your email.");
       try {
-        const res = await fetch("https://hook.eu2.make.com/3ck44is39dfmap58tr7w47mr21dpfdhl", {
+        const res = await fetch("https://hook.eu2.make.com/WEBHOOK_VIEW", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: email,
-            secret: "mysecuretoken"
-          })
+          body: JSON.stringify({ email, secret: "mysecuretoken" })
         });
-
         const tasks = await res.json();
         showTasks(tasks);
-      } catch (error) {
-        container.innerHTML = "<p style='color:red;'>Error loading tasks. Please try again later.</p>";
+        document.getElementById("add-task-section").style.display = "block";
+        document.getElementById("new-email").value = email;
+      } catch (err) {
+        container.innerHTML = "<p style='color:red;'>Error loading tasks.</p>";
       }
     }
 
     function showTasks(tasks) {
       const container = document.getElementById("tasks-container");
-
       if (!Array.isArray(tasks) || tasks.length === 0) {
         container.innerHTML = "<p>No tasks found.</p>";
         return;
       }
-
-      let html = `<table>
-        <tr>
-          <th>Task Name</th>
-          <th>Department</th>
-          <th>Description</th>
-          <th>Hours Spent</th>
-          <th>Update</th>
-        </tr>`;
-
+      let html = `<table><tr>
+        <th>Title</th><th>Dept</th><th>Description</th><th>Status</th><th>Hours</th><th>Update</th>
+      </tr>`;
       tasks.forEach(task => {
-        html += `
-          <tr>
-            <td>${task["Name"] || "-"}</td>
-            <td>${task["Department"] || "-"}</td>
-            <td>${task["Task_Description"] || "-"}</td>
-            <td>
-              <input type="number" id="hours-${task["Task_ID"]}" 
-                     value="${task["Hours_Spent"] || 0}" 
-                     step="0.1" min="0">
-            </td>
-            <td>
-              <button onclick="updateTask('${task["Task_ID"]}')">Save</button>
-            </td>
-          </tr>`;
+        const id = task["Task_ID"];
+        html += `<tr>
+          <td><input id="title-${id}" value="${task["Task_Title"] || ''}"></td>
+          <td><input id="dept-${id}" value="${task["Department"] || ''}"></td>
+          <td><input id="desc-${id}" value="${task["Task_Description"] || ''}"></td>
+          <td>
+            <select id="status-${id}">
+              <option ${task["Status"] === "To Do" ? "selected" : ""}>To Do</option>
+              <option ${task["Status"] === "In Progress" ? "selected" : ""}>In Progress</option>
+              <option ${task["Status"] === "Done" ? "selected" : ""}>Done</option>
+              <option ${task["Status"] === "Paused" ? "selected" : ""}>Paused</option>
+            </select>
+          </td>
+          <td><input type="number" id="hours-${id}" value="${task["Total_Spent_Hours"] || 0}" step="0.1"></td>
+          <td><button onclick="updateTask('${id}')">Save</button></td>
+        </tr>`;
       });
-
       html += `</table>`;
       container.innerHTML = html;
     }
 
-    async function updateTask(taskId) {
-      const input = document.getElementById(`hours-${taskId}`);
-      const hours = parseFloat(input.value);
+    async function updateTask(id) {
+      const data = {
+        taskId: id,
+        Task_Title: document.getElementById(`title-${id}`).value,
+        Department: document.getElementById(`dept-${id}`).value,
+        Task_Description: document.getElementById(`desc-${id}`).value,
+        Status: document.getElementById(`status-${id}`).value,
+        Total_Spent_Hours: parseFloat(document.getElementById(`hours-${id}`).value),
+        secret: "mysecuretoken"
+      };
+      await fetch("https://hook.eu2.make.com/WEBHOOK_UPDATE", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      alert("Task updated!");
+    }
 
-      try {
-        await fetch("https://hook.eu2.make.com/mbm1q2ak4re8ri2fr75fxeddsfq6i71w", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            taskId: taskId,
-            "Hours_Spent": hours,
-            secret: "mysecuretoken"
-          })
-        });
-
-        alert("Task updated!");
-      } catch (error) {
-        alert("Error updating task.");
-      }
+    async function addTask() {
+      const data = {
+        Email: document.getElementById("new-email").value,
+        Task_Title: document.getElementById("new-title").value,
+        Department: document.getElementById("new-department").value,
+        Status: document.getElementById("new-status").value,
+        Task_Description: document.getElementById("new-description").value,
+        Total_Spent_Hours: parseFloat(document.getElementById("new-hours").value),
+        secret: "mysecuretoken"
+      };
+      const res = await fetch("https://hook.eu2.make.com/WEBHOOK_CREATE", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      document.getElementById("add-message").innerText = "Task added!";
     }
   </script>
-
 </body>
 </html>
