@@ -110,11 +110,11 @@
         <th>Title</th><th>Dept</th><th>Description</th><th>Status</th><th>Hours</th><th>Update</th>
       </tr>`;
       tasks.forEach(task => {
-        const id = task["Task_ID"];
+        const id = task["Task ID"];
         html += `<tr>
-          <td><input id="title-${id}" value="${task["Task_Title"] || ''}"></td>
+          <td><input id="title-${id}" value="${task["Task Title"] || ''}"></td>
           <td><input id="dept-${id}" value="${task["Department"] || ''}"></td>
-          <td><input id="desc-${id}" value="${task["Task_Description"] || ''}"></td>
+          <td><input id="desc-${id}" value="${task["Task Description"] || ''}"></td>
           <td>
             <select id="status-${id}">
               <option ${task["Status"] === "To Do" ? "selected" : ""}>To Do</option>
@@ -123,7 +123,7 @@
               <option ${task["Status"] === "Paused" ? "selected" : ""}>Paused</option>
             </select>
           </td>
-          <td><input type="number" id="hours-${id}" value="${task["Total_Spent_Hours"] || 0}" step="0.1"></td>
+          <td><input type="number" id="hours-${id}" value="${task["Hours Spent"] || 0}" step="0.1"></td>
           <td><button onclick="updateTask('${id}')">Save</button></td>
         </tr>`;
       });
